@@ -16,11 +16,7 @@ import javax.swing.JFileChooser;
 
 public class ClientEquipments {
 
-	//private String name;
-
-	/*private String pathKSheet;
-
-	private String pathNewDay;*/
+	private String custommerName;
 
 	private List<Equipment> kSheet = new ArrayList<Equipment>();
 
@@ -32,7 +28,9 @@ public class ClientEquipments {
 
 	}
 
-	public ClientEquipments(String path1, String path2) throws EncryptedDocumentException, InvalidFormatException, IOException {
+	public ClientEquipments(String cName, String path1, String path2) throws EncryptedDocumentException, InvalidFormatException, IOException {
+		
+		this.custommerName = cName;
 		
 		Workbook wbk1 = WorkbookFactory.create(new File(path1));
 		Sheet sheet1 = wbk1.getSheet("Eqt list");
@@ -50,21 +48,9 @@ public class ClientEquipments {
         			standard1.add(std);
         		}break;
         	}
-        }
-        List<Attribute> standard2 = new ArrayList<Attribute>();
-        
-        for(Row row:sheet2) {
-        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
-        		for(Cell cell:row) {
-        			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
-        			standard2.add(std);
-        		}break;
-        	}
-        }
-		
-        for (Row row:sheet1) {
+        }for (Row row:sheet1) {
         	Cell customer = row.getCell(2);
-        	if (dataFormatter.formatCellValue(customer).toString().equals("AIR FRANCE INDUSTRIES")) {
+        	if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
         		int n = row.getRowNum();
         		List<Attribute> newstand = new ArrayList<Attribute>();
         		for(int i = 0; i<row.getLastCellNum(); i++) {
@@ -74,9 +60,19 @@ public class ClientEquipments {
         		this.kSheet.add(equip);
         	}
         }
-        for (Row row:sheet2) {
+        
+        List<Attribute> standard2 = new ArrayList<Attribute>();
+        
+        for(Row row:sheet2) {
+        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
+        		for(Cell cell:row) {
+        			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
+        			standard2.add(std);
+        		}break;
+        	}
+        }for (Row row:sheet2) {
 			Cell customer = row.getCell(2);
-			if (dataFormatter.formatCellValue(customer).toString().equals("AIR FRANCE INDUSTRIES")) {
+			if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
 				int n = row.getRowNum();
         		List<Attribute> newstand = new ArrayList<Attribute>();
 				for(int i = 0; i<row.getLastCellNum(); i++) {
@@ -91,7 +87,10 @@ public class ClientEquipments {
 		wbk2.close();
 	}
 
-	/*public ClientEquipments(File kWorkbook, File newWbk) throws InvalidFormatException, IOException {
+	public ClientEquipments(String cName, File kWorkbook, File newWbk) throws InvalidFormatException, IOException {
+		
+		this.custommerName = cName;
+		
 		Workbook wbk1 = WorkbookFactory.create(kWorkbook);
 		Sheet sheet1 = wbk1.getSheet("Eqt list");
 		Workbook wbk2 = WorkbookFactory.create(newWbk);
@@ -99,136 +98,136 @@ public class ClientEquipments {
 		
 		DataFormatter dataFormatter = new DataFormatter();
 
-		Color ref = sheet2.getRow(0).getCell(0).getCellStyle().getFillBackgroundColorColor();
 		List<Attribute> standard1 = new ArrayList<Attribute>();
         
         for(Row row:sheet1) {
-        	if(row.getCell(1).getCellStyle().getFillBackgroundColorColor()!=ref) {
+        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
         		for(Cell cell:row) {
         			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
         			standard1.add(std);
         		}break;
         	}
+        }for (Row row:sheet1) {
+        	Cell customer = row.getCell(2);
+        	if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
+        		int n = row.getRowNum();
+        		List<Attribute> newstand = new ArrayList<Attribute>();
+        		for(int i = 0; i<row.getLastCellNum(); i++) {
+        			newstand.add(new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
+        		}newstand.add(new Attribute("Has Changed","No"));
+        		Equipment equip = new Equipment(sheet1,n,newstand);
+        		this.kSheet.add(equip);
+        	}
         }
+        
         List<Attribute> standard2 = new ArrayList<Attribute>();
         
         for(Row row:sheet2) {
-        	if(row.getCell(1).getCellStyle().getFillBackgroundColorColor()!=ref) {
+        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
         		for(Cell cell:row) {
         			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
         			standard2.add(std);
         		}break;
         	}
-        }
-		for (Row row:sheet1) {
-
-			Cell customer = row.getCell(3);
-
-			if (dataFormatter.formatCellValue(customer)=="AIR FRANCE INDUSTRIES") {
-
+        }for (Row row:sheet2) {
+			Cell customer = row.getCell(2);
+			if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
 				int n = row.getRowNum();
+        		List<Attribute> newstand = new ArrayList<Attribute>();
 				for(int i = 0; i<row.getLastCellNum(); i++) {
-					standard1.set(i, new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
-				}
-				Equipment equip = new Equipment(sheet1,n,standard1);
-				kSheet.add(equip);
-
-			}
-		}
-		for (Row row:sheet2) {
-
-			Cell customer = row.getCell(3);
-
-			if (dataFormatter.formatCellValue(customer)=="AIR FRANCE INDUSTRIES") {
-
-				int n = row.getRowNum();
-				for(int i = 0; i<row.getLastCellNum(); i++) {
-					standard2.set(i, new Attribute(standard2.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
-				}
-				Equipment equip = new Equipment(sheet2,n,standard2);
-				newSheet.add(equip);
-
+        			newstand.add(new Attribute(standard2.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
+				}newstand.add(new Attribute("Has Changed","No"));
+        		newstand.add(new Attribute("Last State of this Data",""));
+				Equipment equip = new Equipment(sheet2,n,newstand);
+				this.newSheet.add(equip);
 			}
 		}
 		wbk1.close();
 		wbk2.close();
 	}
-	*/
-	/*public ClientEquipments(Sheet kaSheet, Sheet nSheet) {
+	
+	public ClientEquipments(String cName, Sheet sheet1, Sheet sheet2, Sheet sorties1, Sheet sorties2) {
+		
+		this.custommerName = cName;
 		
 		DataFormatter dataFormatter = new DataFormatter();
 
-		Color ref = nSheet.getRow(0).getCell(0).getCellStyle().getFillBackgroundColorColor();
 		List<Attribute> standard1 = new ArrayList<Attribute>();
         
-        for(Row row:kaSheet) {
-        	if(row.getCell(1).getCellStyle().getFillBackgroundColorColor()!=ref) {
+        for(Row row:sheet1) {
+        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
         		for(Cell cell:row) {
         			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
         			standard1.add(std);
         		}break;
         	}
+        }for (Row row:sheet1) {
+        	Cell customer = row.getCell(2);
+        	if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
+        		int n = row.getRowNum();
+        		List<Attribute> newstand = new ArrayList<Attribute>();
+        		for(int i = 0; i<row.getLastCellNum(); i++) {
+        			newstand.add(new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
+        		}newstand.add(new Attribute("Has Changed","No"));
+        		Equipment equip = new Equipment(sheet1,n,newstand);
+        		this.kSheet.add(equip);
+        	}
         }
+        
         List<Attribute> standard2 = new ArrayList<Attribute>();
         
-        for(Row row:nSheet) {
-        	if(row.getCell(1).getCellStyle().getFillBackgroundColorColor()!=ref) {
+        for(Row row:sheet2) {
+        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
         		for(Cell cell:row) {
         			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
         			standard2.add(std);
         		}break;
         	}
-        }
-		
-		for (Row row:kaSheet) {
-
-			Cell customer = row.getCell(3);
-
-			if (dataFormatter.formatCellValue(customer)=="AIR FRANCE INDUSTRIES") {
-
+        }for (Row row:sheet2) {
+			Cell customer = row.getCell(2);
+			if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
 				int n = row.getRowNum();
+        		List<Attribute> newstand = new ArrayList<Attribute>();
 				for(int i = 0; i<row.getLastCellNum(); i++) {
-					standard1.set(i, new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
-				}
-				Equipment equip = new Equipment(kaSheet,n,standard1);
-				kSheet.add(equip);
-
+        			newstand.add(new Attribute(standard2.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
+				}newstand.add(new Attribute("Has Changed","No"));
+        		newstand.add(new Attribute("Last State of this Data",""));
+				Equipment equip = new Equipment(sheet2,n,newstand);
+				this.newSheet.add(equip);
 			}
 		}
-		for (Row row:nSheet) {
-
-			Cell customer = row.getCell(3);
-
-			if (dataFormatter.formatCellValue(customer)=="AIR FRANCE INDUSTRIES") {
-
-				int n = row.getRowNum();
-				for(int i = 0; i<row.getLastCellNum(); i++) {
-					standard2.set(i, new Attribute(standard2.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
-				}
-				Equipment equip = new Equipment(nSheet,n,standard2);
-				newSheet.add(equip);
-
-			}
-		}		
-	}*/
-	/*
-	public String getName() {
-		return name;
+        
+        
 	}
+	
+	public void buildLists(Sheet sheet) {
+		
+		DataFormatter dataFormatter = new DataFormatter();
 
-	public void setName(String name) {
-		this.name = name;
+		List<Attribute> standard1 = new ArrayList<Attribute>();
+        
+        for(Row row:sheet) {
+        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
+        		for(Cell cell:row) {
+        			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
+        			standard1.add(std);
+        		}break;
+        	}
+        }for (Row row:sheet) {
+        	Cell customer = row.getCell(2);
+        	if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
+        		int n = row.getRowNum();
+        		List<Attribute> newstand = new ArrayList<Attribute>();
+        		for(int i = 0; i<row.getLastCellNum(); i++) {
+        			newstand.add(new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
+        		}newstand.add(new Attribute("Has Changed","No"));
+        		Equipment equip = new Equipment(sheet,n,newstand);
+        		this.kSheet.add(equip);
+        	}
+        }
+        
 	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-	 */
-
+	
 	public List<Equipment> getkSheet() {
 		return kSheet;
 	}
@@ -243,6 +242,22 @@ public class ClientEquipments {
 
 	public void setNewSheet(List<Equipment> newSheet) {
 		this.newSheet = newSheet;
+	}
+
+	public String getCustommerName() {
+		return custommerName;
+	}
+
+	public void setCustommerName(String custommerName) {
+		this.custommerName = custommerName;
+	}
+
+	public List<Equipment> getOutingEqpt() {
+		return outingEqpt;
+	}
+
+	public void setOutingEqpt(List<Equipment> outingEqpt) {
+		this.outingEqpt = outingEqpt;
 	}
 
 }
