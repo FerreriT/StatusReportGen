@@ -1,5 +1,6 @@
 package statusreport.gen;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
@@ -149,20 +150,22 @@ public class ClientEquipments {
 	public ClientEquipments(String cName, Sheet sheet1, Sheet sheet2, Sheet sorties1, Sheet sorties2) {
 		
 		this.custommerName = cName;
-		
 		DataFormatter dataFormatter = new DataFormatter();
 
 		List<Attribute> standard1 = new ArrayList<Attribute>();
         
+		int nbFirstRow=0;
+		
         for(Row row:sheet1) {
-        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
+        	if(!row.getCell(row.getFirstCellNum()).getStringCellValue().isEmpty()) {
+        		nbFirstRow = row.getRowNum();
         		for(Cell cell:row) {
         			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
         			standard1.add(std);
         		}break;
         	}
         }for (Row row:sheet1) {
-        	Cell customer = row.getCell(2);
+        	Cell customer = row.getCell(row.getFirstCellNum()+2);
         	if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
         		int n = row.getRowNum();
         		List<Attribute> newstand = new ArrayList<Attribute>();
@@ -173,23 +176,29 @@ public class ClientEquipments {
         		this.kSheet.add(equip);
         	}
         }
-        
+
         List<Attribute> standard2 = new ArrayList<Attribute>();
         
         for(Row row:sheet2) {
-        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
+        	if(!row.getCell(row.getFirstCellNum()).getStringCellValue().isEmpty()) {
+        		nbFirstRow = row.getRowNum();
         		for(Cell cell:row) {
-        			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
-        			standard2.add(std);
+        			if(!(cell == null || cell.getCellTypeEnum()==CellType.BLANK || cell.toString().isEmpty())) {
+        				Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
+        				standard2.add(std);
+        			}
         		}break;
         	}
         }for (Row row:sheet2) {
-			Cell customer = row.getCell(2);
+			Cell customer = row.getCell(row.getFirstCellNum()+2);
 			if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
 				int n = row.getRowNum();
         		List<Attribute> newstand = new ArrayList<Attribute>();
-				for(int i = 0; i<row.getLastCellNum(); i++) {
-        			newstand.add(new Attribute(standard2.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
+        		int j=0;
+				for(int i = 0; i<standard2.size(); i++) {
+					while((sheet2.getRow(nbFirstRow).getCell(i+j) == null || sheet2.getRow(nbFirstRow).getCell(i+j).
+							getCellTypeEnum()==CellType.BLANK || sheet2.getRow(nbFirstRow).getCell(i+j).toString().isEmpty())) j++;
+					newstand.add(new Attribute(standard2.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i+j))));
 				}newstand.add(new Attribute("Has Changed","No"));
         		newstand.add(new Attribute("Last State of this Data",""));
 				Equipment equip = new Equipment(sheet2,n,newstand);
@@ -200,21 +209,23 @@ public class ClientEquipments {
         
 	}
 	
-	public void buildLists(Sheet sheet) {
+	public void buildLists(Sheet sheet, int type) {
 		
 		DataFormatter dataFormatter = new DataFormatter();
 
+		int lastRowNum = sheet.getLastRowNum();
+		
 		List<Attribute> standard1 = new ArrayList<Attribute>();
         
         for(Row row:sheet) {
-        	if(!row.getCell(1).getStringCellValue().isEmpty()) {
+        	if(!row.getCell(row.getFirstCellNum()).getStringCellValue().isEmpty()) {
         		for(Cell cell:row) {
         			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
         			standard1.add(std);
         		}break;
         	}
         }for (Row row:sheet) {
-        	Cell customer = row.getCell(2);
+        	Cell customer = row.getCell(row.getFirstCellNum()+2);
         	if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
         		int n = row.getRowNum();
         		List<Attribute> newstand = new ArrayList<Attribute>();

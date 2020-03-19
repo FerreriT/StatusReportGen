@@ -131,7 +131,7 @@ public class Runner {
 	public static void main(String[] args) throws InvalidFormatException, IOException {
 
 		String path1 = "H:/Copy of CPT - ASI - Workload NEW 030320 (ProjetAutoStatusReport).xlsx";
-		String path2 = "H:/Copy of CPT - ASI - Workload NEW 040320.xls";
+		String path2 = "H:/Copy of CPT - ASI - Workload NEW 090320.xls";
 		String path3 = "H:/Copy of CPT - RPM - Sorties 070320.xls";
 		String path4 = "H:/Copy of CPT - RPM - Sorties 070320.xls";
 		String sheetName = "Eqt list";
