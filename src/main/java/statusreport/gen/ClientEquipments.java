@@ -160,8 +160,10 @@ public class ClientEquipments {
         	if(!row.getCell(row.getFirstCellNum()).getStringCellValue().isEmpty()) {
         		nbFirstRow = row.getRowNum();
         		for(Cell cell:row) {
-        			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
-        			standard1.add(std);
+        			if(!(cell == null || cell.getCellTypeEnum()==CellType.BLANK || cell.toString().isEmpty())) {
+        				Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
+        				standard1.add(std);
+        			}
         		}break;
         	}
         }for (Row row:sheet1) {
@@ -169,9 +171,12 @@ public class ClientEquipments {
         	if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
         		int n = row.getRowNum();
         		List<Attribute> newstand = new ArrayList<Attribute>();
-        		for(int i = 0; i<row.getLastCellNum(); i++) {
-        			newstand.add(new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
-        		}newstand.add(new Attribute("Has Changed","No"));
+        		int j=0;
+				for(int i = 0; i<standard1.size(); i++) {
+					while((sheet1.getRow(nbFirstRow).getCell(i+j) == null || sheet1.getRow(nbFirstRow).getCell(i+j).
+							getCellTypeEnum()==CellType.BLANK || sheet1.getRow(nbFirstRow).getCell(i+j).toString().isEmpty())) j++;
+					newstand.add(new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i+j))));
+				}newstand.add(new Attribute("Has Changed","No"));
         		Equipment equip = new Equipment(sheet1,n,newstand);
         		this.kSheet.add(equip);
         	}
@@ -210,33 +215,52 @@ public class ClientEquipments {
 	}
 	
 	public void buildLists(Sheet sheet, int type) {
-		
+
 		DataFormatter dataFormatter = new DataFormatter();
 
-		int lastRowNum = sheet.getLastRowNum();
-		
 		List<Attribute> standard1 = new ArrayList<Attribute>();
-        
-        for(Row row:sheet) {
-        	if(!row.getCell(row.getFirstCellNum()).getStringCellValue().isEmpty()) {
-        		for(Cell cell:row) {
-        			Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
-        			standard1.add(std);
-        		}break;
-        	}
-        }for (Row row:sheet) {
-        	Cell customer = row.getCell(row.getFirstCellNum()+2);
-        	if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
-        		int n = row.getRowNum();
-        		List<Attribute> newstand = new ArrayList<Attribute>();
-        		for(int i = 0; i<row.getLastCellNum(); i++) {
-        			newstand.add(new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i))));
-        		}newstand.add(new Attribute("Has Changed","No"));
-        		Equipment equip = new Equipment(sheet,n,newstand);
-        		this.kSheet.add(equip);
-        	}
-        }
-        
+
+		int nbFirstRow=0;
+
+		for(Row row:sheet) {
+			if(!row.getCell(row.getFirstCellNum()).getStringCellValue().isEmpty()) {
+				nbFirstRow = row.getRowNum();
+				for(Cell cell:row) {
+					if(!(cell == null || cell.getCellTypeEnum()==CellType.BLANK || cell.toString().isEmpty())) {
+						Attribute std = new Attribute(dataFormatter.formatCellValue(cell));
+						standard1.add(std);
+					}
+				}break;
+			}
+		}for (Row row:sheet) {
+			Cell customer = row.getCell(row.getFirstCellNum()+2);
+			if (dataFormatter.formatCellValue(customer).toString().equals(this.custommerName)) {
+				int n = row.getRowNum();
+				List<Attribute> newstand = new ArrayList<Attribute>();
+				int j=0;
+				for(int i = 0; i<standard1.size(); i++) {
+					while((sheet.getRow(nbFirstRow).getCell(i+j) == null || sheet.getRow(nbFirstRow).getCell(i+j).
+							getCellTypeEnum()==CellType.BLANK || sheet.getRow(nbFirstRow).getCell(i+j).toString().isEmpty())) j++;
+					newstand.add(new Attribute(standard1.get(i).getName(),dataFormatter.formatCellValue(row.getCell(i+j))));
+				}Equipment equip;
+				switch(type) {
+				case 0:
+					break;
+				case 1:
+					newstand.add(new Attribute("Has Changed","No"));
+	        		equip = new Equipment(sheet,n,newstand);
+	        		this.kSheet.add(equip);
+					break;
+				case 2:
+					newstand.add(new Attribute("Has Changed","No"));
+	        		newstand.add(new Attribute("Last State of this Data",""));
+					equip = new Equipment(sheet,n,newstand);
+					this.newSheet.add(equip);
+					break;
+				}
+			}
+		}
+
 	}
 	
 	public List<Equipment> getkSheet() {
