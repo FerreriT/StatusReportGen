@@ -52,7 +52,8 @@ public class ComparisonWriter {
         
         this.headerCellStyle1 = this.workbook1.createCellStyle();
         this.headerCellStyle1.setFont(headerFont1);
-        this.headerCellStyle1.setFillBackgroundColor((short)200);
+        this.headerCellStyle1.setFillForegroundColor(IndexedColors.BLUE.getIndex());
+        this.headerCellStyle1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         
         this.changedCellStyle1 = this.workbook1.createCellStyle();
         this.changedCellStyle1.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
@@ -78,11 +79,14 @@ public class ComparisonWriter {
         
         this.listAFI2 = new ArrayList<Equipment>();
         
-        
         this.eqpChangedAttr = new ArrayList<Equipment>();
         this.outlet = new ArrayList<Equipment>();
         
         this.path = "";
+    }
+    
+    public void buildOutlet(List<Equipment> outlet1, List<Equipment> outlet2) {
+    	
     }
 
 	public void wkbk1Writing() {
@@ -121,7 +125,7 @@ public class ComparisonWriter {
     	}
     }
     
-    public void wkbk2Writing() {
+    public void wkbk2Writing(int n) {
     	int nRow = 0;
         Row headerRow2 = this.sheet2.createRow(nRow);
         Equipment eqp2 = this.listAFI2.get(nRow);
@@ -167,14 +171,26 @@ public class ComparisonWriter {
     	nRow+=2;
     	Row secHeaderRow = this.sheet2.createRow(nRow++);
     	Cell headerCell = secHeaderRow.createCell(0);
-    	headerCell.setCellValue("Below, equipment outings");
-    	
+    	headerCell.setCellValue("Below, equipment outings from last time");
+    	int compt = 0;Row row;
     	for(Equipment eqp:this.outlet) {
-    		Row row = this.sheet2.createRow(nRow);
+    		row = this.sheet2.createRow(nRow++);
+    		if(compt==n) {
+    			Row secHeaderRow2 = this.sheet2.createRow(nRow++);
+    	    	Equipment eqpo = this.outlet.get(n);
+    	    	for(int i=0;i<eqpo.getAttributes().size();i++) {
+    	        	Cell cell = secHeaderRow2.createCell(i);
+    	        	cell.setCellStyle(this.headerCellStyle2);
+    	        	cell.setCellValue(eqpo.getNomChamp(i));
+    	        }row = this.sheet2.createRow(nRow++);
+    		}
     		List<Attribute> attr = eqp.getAttributes();
     		for(int i=0; i<attr.size(); i++) {
         		row.createCell(i).setCellValue(attr.get(i).getValue());
-        	}
+        	}compt++;
+    	}List<Attribute> attr3 = this.outlet.get(n).getAttributes();
+    	for(int i=0; i<attr3.size(); i++) {
+    		this.sheet2.autoSizeColumn(i);
     	}
     }
     
