@@ -1,7 +1,6 @@
 package statusreport.gen;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,7 +70,8 @@ public class ComparisonWriter {
         
         this.headerCellStyle2 = this.workbook2.createCellStyle();
         this.headerCellStyle2.setFont(headerFont2);
-        this.headerCellStyle2.setFillBackgroundColor((short)200);
+        this.headerCellStyle2.setFillForegroundColor(IndexedColors.BLUE.getIndex());
+        this.headerCellStyle2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         
         this.changedCellStyle2 = this.workbook2.createCellStyle();
         this.changedCellStyle2.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
@@ -195,13 +195,13 @@ public class ComparisonWriter {
     }
     
     public void saveWkbk1(String fileName) throws IOException {
-    	FileOutputStream fileOut1 = new FileOutputStream(new File(this.path,fileName));
+    	FileOutputStream fileOut1 = new FileOutputStream(new File(fileName));
         this.workbook1.write(fileOut1);
         fileOut1.close();
     }
     
     public void saveWkbk2(String fileName) throws IOException {
-    	FileOutputStream fileOut2 = new FileOutputStream(new File(this.path,fileName));
+    	FileOutputStream fileOut2 = new FileOutputStream(new File(fileName));
         this.workbook2.write(fileOut2);
         fileOut2.close();
     }
