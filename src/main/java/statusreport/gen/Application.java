@@ -3,21 +3,14 @@ package statusreport.gen;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-import javax.swing.Box;
 import javax.swing.JTabbedPane;
-import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import com.jgoodies.forms.layout.Sizes;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -27,18 +20,12 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.awt.ComponentOrientation;
-import java.awt.Frame;
-import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.Color;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 
 public class Application {
 
